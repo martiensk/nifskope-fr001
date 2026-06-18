@@ -95,6 +95,34 @@ public:
 	void clear() override final;
 	//! Check if a Starfield model uses internal geometry data, and optionally convert meshes. Returns true on success.
 	bool checkInternalGeometry( const QModelIndex & blockIndex );
+	//! Convert all external .mesh geometry in a Starfield NIF to internal geometry. Returns true if any blocks were modified.
+	bool convertToInternalGeometry();
+	//! Convert all internal geometry in a Starfield NIF to external .mesh files. Returns true if any blocks were modified.
+	bool convertToExternalGeometry();
+	//! Convert all internal geometry in a Starfield NIF to external .mesh files using an explicit output folder.
+	bool convertToExternalGeometry( const QString & outputDirectory );
+	//! Remove any unreferenced strings from the NIF header. Returns true if any strings were removed.
+	bool removeUnusedStrings();
+	//! Remove duplicate vertices from all geometry blocks. Always returns true (file is always saved).
+	bool removeDuplicateVertices();
+	//! Remove unused vertices from all geometry blocks. Always returns true (file is always saved).
+	bool removeUnusedVertices();
+	//! Generate Starfield mesh LODs for internal BSGeometry blocks. Always returns true (file is always saved).
+	bool generateMeshLODs();
+	//! Optimize triangle index ordering for vertex cache efficiency across all geometry blocks. Always returns true (file is always saved).
+	bool optimizeIndices();
+	//! Add missing tangent space arrays and update tangents/bitangents across applicable geometry blocks. Always returns true (file is always saved).
+	bool addTangentSpacesAndUpdate();
+	//! Update bounding spheres/boxes for applicable geometry blocks. Always returns true (file is always saved).
+	bool updateBounds();
+	//! Combine duplicate shader properties into a single shared block. Always returns true (file is always saved).
+	bool combineProperties();
+	//! Remove bogus/unlinked nodes for the target NIF version. Always returns true (file is always saved).
+	bool removeBogusNodes();
+	//! Reorder blocks so the game can properly load them. Always returns true (file is always saved).
+	bool reorderBlocks();
+	//! Sanitize before save to fix minor errors (for example duplicate block names). Always returns true (file is always saved).
+	bool sanitizeBeforeSave();
 	bool load( QIODevice & device, const char* fileName = nullptr ) override final;
 	bool save( QIODevice & device ) const override final;
 
