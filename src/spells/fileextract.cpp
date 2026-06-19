@@ -408,6 +408,9 @@ REGISTER_SPELL( spExtractAllMaterials )
 class spMeshFileExport final : public Spell
 {
 public:
+	static constexpr const char * kMissingOutputDirectoryError =
+		"missing output directory for external mesh export; use -o <folder> (CLI) or set it in GUI via Convert to External Geometry first";
+
 	QString name() const override final { return Spell::tr( "Convert to External Geometry" ); }
 	QString page() const override final { return Spell::tr( "Mesh" ); }
 
@@ -426,8 +429,23 @@ public:
 	static bool processAllItems( NifModel * nif );
 	static bool processAllItems( NifModel * nif, const QString & outputDirectory );
 	static bool processAllItems( NifModel * nif, const std::string & outputDirectory, const QString & meshDir );
+	static QString getNormalizedMeshDir();
 	QModelIndex cast( NifModel * nif, const QModelIndex & index ) override final;
 };
+
+QString spMeshFileExport::getNormalizedMeshDir()
+{
+	QSettings	settings;
+	QString	meshDir = settings.value( "Settings/Importex/Mesh Export Dir", QString() ).toString().trimmed().toLower();
+	meshDir.replace( QChar('/'), QChar('\\') );
+	while ( meshDir.endsWith( QChar('\\') ) )
+		meshDir.chop( 1 );
+	while ( meshDir.startsWith( QChar('\\') ) )
+		meshDir.remove( 0, 1 );
+	if ( !meshDir.isEmpty() )
+		meshDir.append( QChar('\\') );
+	return meshDir;
+}
 
 void spMeshFileExport::saveMeshData( QByteArray & meshBuf, NifModel * nif, const NifItem * meshDataItem )
 {
@@ -515,24 +533,12 @@ bool spMeshFileExport::processAllItems( NifModel * nif )
 	std::string	outputDirectory( spResourceFileExtract::getOutputDirectory( nif ) );
 	if ( outputDirectory.empty() ) {
 		if ( nif->getBatchProcessingMode() ) {
-			throw NifSkopeError(
-				"missing output directory for external mesh export; set it in GUI via Convert to External Geometry first" );
+			throw NifSkopeError( kMissingOutputDirectoryError );
 		}
 		return false;
 	}
 
-	QString	meshDir;
-	{
-		QSettings	settings;
-		meshDir = settings.value( "Settings/Importex/Mesh Export Dir", QString() ).toString().trimmed().toLower();
-	}
-	meshDir.replace( QChar('/'), QChar('\\') );
-	while ( meshDir.endsWith( QChar('\\') ) )
-		meshDir.chop( 1 );
-	while ( meshDir.startsWith( QChar('\\') ) )
-		meshDir.remove( 0, 1 );
-	if ( !meshDir.isEmpty() )
-		meshDir.append( QChar('\\') );
+	QString	meshDir = getNormalizedMeshDir();
 
 	bool meshesConverted = processAllItems( nif, outputDirectory, meshDir );
 	if ( meshesConverted && !nif->getBatchProcessingMode() )
@@ -550,7 +556,7 @@ bool spMeshFileExport::processAllItems( NifModel * nif, const QString & outputDi
 		outputDir.chop( 1 );
 	if ( outputDir.isEmpty() ) {
 		if ( nif->getBatchProcessingMode() )
-			throw NifSkopeError( "missing output directory for external mesh export; use -o <folder> or set it in GUI via Convert to External Geometry first" );
+			throw NifSkopeError( kMissingOutputDirectoryError );
 		return false;
 	}
 
@@ -561,18 +567,7 @@ bool spMeshFileExport::processAllItems( NifModel * nif, const QString & outputDi
 			outputDirectoryStd += '/';
 	}
 
-	QString	meshDir;
-	{
-		QSettings	settings;
-		meshDir = settings.value( "Settings/Importex/Mesh Export Dir", QString() ).toString().trimmed().toLower();
-	}
-	meshDir.replace( QChar('/'), QChar('\\') );
-	while ( meshDir.endsWith( QChar('\\') ) )
-		meshDir.chop( 1 );
-	while ( meshDir.startsWith( QChar('\\') ) )
-		meshDir.remove( 0, 1 );
-	if ( !meshDir.isEmpty() )
-		meshDir.append( QChar('\\') );
+	QString	meshDir = getNormalizedMeshDir();
 
 	bool meshesConverted = processAllItems( nif, outputDirectoryStd, meshDir );
 	if ( meshesConverted && !nif->getBatchProcessingMode() )
@@ -595,18 +590,7 @@ QModelIndex spMeshFileExport::cast( NifModel * nif, const QModelIndex & index )
 		if ( outputDirectory.empty() )
 			return index;
 
-		QString	meshDir;
-		{
-			QSettings	settings;
-			meshDir = settings.value( "Settings/Importex/Mesh Export Dir", QString() ).toString().trimmed().toLower();
-		}
-		meshDir.replace( QChar('/'), QChar('\\') );
-		while ( meshDir.endsWith( QChar('\\') ) )
-			meshDir.chop( 1 );
-		while ( meshDir.startsWith( QChar('\\') ) )
-			meshDir.remove( 0, 1 );
-		if ( !meshDir.isEmpty() )
-			meshDir.append( QChar('\\') );
+		QString	meshDir = getNormalizedMeshDir();
 
 		meshesConverted = processItem( nif, item, outputDirectory, meshDir );
 	} else {

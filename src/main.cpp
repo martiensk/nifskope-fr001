@@ -245,90 +245,37 @@ int main( int argc, char * argv[] )
 		parser.process( *a );
 
 		// Headless options are not supported in GUI mode
-		if ( parser.isSet( guiConvertToInternalGeomOpt ) ) {
-			QTextStream err( stderr );
-			err << "Error: --ConvertToInternalGeometry requires headless mode. Use: NifSkope -no-gui --ConvertToInternalGeometry <path>\n";
-			err.flush();
-			return 1;
+		const struct HeadlessGuardOption {
+			const QCommandLineOption * option;
+			const char * errorMessage;
+		} headlessGuardOptions[] = {
+			{ &guiConvertToInternalGeomOpt, "Error: --ConvertToInternalGeometry requires headless mode. Use: NifSkope -no-gui --ConvertToInternalGeometry <path>\n" },
+			{ &guiConvertToExternalGeomOpt, "Error: --ConvertToExternalGeometry requires headless mode. Use: NifSkope -no-gui --ConvertToExternalGeometry <path>\n" },
+			{ &guiOutputFolderOpt, "Error: -o/--OutputFolder requires headless mode. Use: NifSkope -no-gui --ConvertToExternalGeometry <path> -o <folder>\n" },
+			{ &guiRemoveUnusedStringsOpt, "Error: --RemoveUnusedStrings requires headless mode. Use: NifSkope -no-gui --RemoveUnusedStrings <path>\n" },
+			{ &guiRemoveDuplicateVerticesOpt, "Error: --RemoveDuplicateVertices requires headless mode. Use: NifSkope -no-gui --RemoveDuplicateVertices <path>\n" },
+			{ &guiRemoveUnusedVerticesOpt, "Error: --RemoveUnusedVertices requires headless mode. Use: NifSkope -no-gui --RemoveUnusedVertices <path>\n" },
+			{ &guiGenerateMeshLODsOpt, "Error: --GenerateMeshLODs requires headless mode. Use: NifSkope -no-gui --GenerateMeshLODs <path>\n" },
+			{ &guiOptimizeIndicesOpt, "Error: --OptimizeIndices requires headless mode. Use: NifSkope -no-gui --OptimizeIndices <path>\n" },
+			{ &guiAddTangentSpacesAndUpdateOpt, "Error: --AddTangentSpacesAndUpdate requires headless mode. Use: NifSkope -no-gui --AddTangentSpacesAndUpdate <path>\n" },
+			{ &guiUpdateBoundsOpt, "Error: --UpdateBounds requires headless mode. Use: NifSkope -no-gui --UpdateBounds <path>\n" },
+			{ &guiCombinePropertiesOpt, "Error: --CombineProperties requires headless mode. Use: NifSkope -no-gui --CombineProperties <path>\n" },
+			{ &guiRemoveBogusNodesOpt, "Error: --RemoveBogusNodes requires headless mode. Use: NifSkope -no-gui --RemoveBogusNodes <path>\n" },
+			{ &guiReorderBlocksOpt, "Error: --ReorderBlocks requires headless mode. Use: NifSkope -no-gui --ReorderBlocks <path>\n" },
+			{ &guiSanitizeBeforeSaveOpt, "Error: --SanitizeBeforeSave requires headless mode. Use: NifSkope -no-gui --SanitizeBeforeSave <path>\n" }
+		};
+
+		bool hasHeadlessOnlyOption = false;
+		QTextStream err( stderr );
+		for ( const auto & guard : headlessGuardOptions ) {
+			if ( parser.isSet( *guard.option ) ) {
+				err << guard.errorMessage;
+				hasHeadlessOnlyOption = true;
+			}
 		}
-		if ( parser.isSet( guiConvertToExternalGeomOpt ) ) {
-			QTextStream err( stderr );
-			err << "Error: --ConvertToExternalGeometry requires headless mode. Use: NifSkope -no-gui --ConvertToExternalGeometry <path>\n";
-			err.flush();
+		err.flush();
+		if ( hasHeadlessOnlyOption )
 			return 1;
-		}
-		if ( parser.isSet( guiOutputFolderOpt ) ) {
-			QTextStream err( stderr );
-			err << "Error: -o/--OutputFolder requires headless mode. Use: NifSkope -no-gui --ConvertToExternalGeometry <path> -o <folder>\n";
-			err.flush();
-			return 1;
-		}
-		if ( parser.isSet( guiRemoveUnusedStringsOpt ) ) {
-			QTextStream err( stderr );
-			err << "Error: --RemoveUnusedStrings requires headless mode. Use: NifSkope -no-gui --RemoveUnusedStrings <path>\n";
-			err.flush();
-			return 1;
-		}
-		if ( parser.isSet( guiRemoveDuplicateVerticesOpt ) ) {
-			QTextStream err( stderr );
-			err << "Error: --RemoveDuplicateVertices requires headless mode. Use: NifSkope -no-gui --RemoveDuplicateVertices <path>\n";
-			err.flush();
-			return 1;
-		}
-		if ( parser.isSet( guiRemoveUnusedVerticesOpt ) ) {
-			QTextStream err( stderr );
-			err << "Error: --RemoveUnusedVertices requires headless mode. Use: NifSkope -no-gui --RemoveUnusedVertices <path>\n";
-			err.flush();
-			return 1;
-		}
-		if ( parser.isSet( guiGenerateMeshLODsOpt ) ) {
-			QTextStream err( stderr );
-			err << "Error: --GenerateMeshLODs requires headless mode. Use: NifSkope -no-gui --GenerateMeshLODs <path>\n";
-			err.flush();
-			return 1;
-		}
-		if ( parser.isSet( guiOptimizeIndicesOpt ) ) {
-			QTextStream err( stderr );
-			err << "Error: --OptimizeIndices requires headless mode. Use: NifSkope -no-gui --OptimizeIndices <path>\n";
-			err.flush();
-			return 1;
-		}
-		if ( parser.isSet( guiAddTangentSpacesAndUpdateOpt ) ) {
-			QTextStream err( stderr );
-			err << "Error: --AddTangentSpacesAndUpdate requires headless mode. Use: NifSkope -no-gui --AddTangentSpacesAndUpdate <path>\n";
-			err.flush();
-			return 1;
-		}
-		if ( parser.isSet( guiUpdateBoundsOpt ) ) {
-			QTextStream err( stderr );
-			err << "Error: --UpdateBounds requires headless mode. Use: NifSkope -no-gui --UpdateBounds <path>\n";
-			err.flush();
-			return 1;
-		}
-		if ( parser.isSet( guiCombinePropertiesOpt ) ) {
-			QTextStream err( stderr );
-			err << "Error: --CombineProperties requires headless mode. Use: NifSkope -no-gui --CombineProperties <path>\n";
-			err.flush();
-			return 1;
-		}
-		if ( parser.isSet( guiRemoveBogusNodesOpt ) ) {
-			QTextStream err( stderr );
-			err << "Error: --RemoveBogusNodes requires headless mode. Use: NifSkope -no-gui --RemoveBogusNodes <path>\n";
-			err.flush();
-			return 1;
-		}
-		if ( parser.isSet( guiReorderBlocksOpt ) ) {
-			QTextStream err( stderr );
-			err << "Error: --ReorderBlocks requires headless mode. Use: NifSkope -no-gui --ReorderBlocks <path>\n";
-			err.flush();
-			return 1;
-		}
-		if ( parser.isSet( guiSanitizeBeforeSaveOpt ) ) {
-			QTextStream err( stderr );
-			err << "Error: --SanitizeBeforeSave requires headless mode. Use: NifSkope -no-gui --SanitizeBeforeSave <path>\n";
-			err.flush();
-			return 1;
-		}
 
 		// Override port value
 		if ( parser.isSet( portOption ) )
@@ -499,20 +446,29 @@ int main( int argc, char * argv[] )
 			return 1;
 		}
 
+		const QString startupWorkingDir = QDir::currentPath();
+
 		// Load NIF/XML schema (required before any NifModel usage)
 		QDir::setCurrent( qApp->applicationDirPath() );
 		NifModel::loadXML();
 		KfmModel::loadXML();
 
 		// Collect .nif files from the given path (file or directory)
-		auto collectNifFiles = []( const QString & path ) -> QStringList {
+		auto collectNifFiles = [ &startupWorkingDir ]( const QString & path ) -> QStringList {
 			QStringList files;
-			QFileInfo fi( path );
+			const QString inputPath = QDir::fromNativeSeparators( path ).trimmed();
+			if ( inputPath.isEmpty() )
+				return files;
+
+			QFileInfo fi( inputPath );
+			if ( fi.isRelative() )
+				fi = QFileInfo( QDir( startupWorkingDir ).filePath( inputPath ) );
+
 			if ( fi.isFile() ) {
-				if ( path.endsWith( QLatin1String( ".nif" ), Qt::CaseInsensitive ) )
-					files.append( QDir::fromNativeSeparators( path ) );
+				if ( fi.fileName().endsWith( QLatin1String( ".nif" ), Qt::CaseInsensitive ) )
+					files.append( QDir::fromNativeSeparators( fi.absoluteFilePath() ) );
 			} else if ( fi.isDir() ) {
-				QDirIterator it( path, QStringList{ QStringLiteral( "*.nif" ) },
+				QDirIterator it( fi.absoluteFilePath(), QStringList{ QStringLiteral( "*.nif" ) },
 								QDir::Files | QDir::Readable,
 								QDirIterator::Subdirectories );
 				while ( it.hasNext() )
@@ -663,12 +619,17 @@ int main( int argc, char * argv[] )
 			return exitCode;
 		}
 
-		if ( parser.isSet( removeUnusedStringsOpt ) ) {
-			const QString inputPath = parser.value( removeUnusedStringsOpt );
+		auto runBatchOperation = [ & ](
+			const QString & operationName,
+			const QString & inputPath,
+			const QString & savedMessage,
+			const QString & skippedMessage,
+			bool reportsModificationStatus,
+			auto processCallback ) -> int {
 			const QStringList fileList = collectNifFiles( inputPath );
 
 			if ( fileList.isEmpty() ) {
-				err << "RemoveUnusedStrings: no .nif files found at '" << inputPath << "'\n";
+				err << operationName << ": no .nif files found at '" << inputPath << "'\n";
 				err.flush();
 				return 1;
 			}
@@ -697,201 +658,27 @@ int main( int argc, char * argv[] )
 						exitCode = 1;
 						continue;
 					}
-					bool modified = nif.removeUnusedStrings();
-					if ( modified ) {
-						QFile f( filePath );
-						if ( !f.open( QIODevice::WriteOnly ) ) {
-							err << "  Error: cannot open file for writing\n";
-							err.flush();
-							exitCode = 1;
-							continue;
-						}
-						nif.save( f );
-						out << "  Saved (unused strings removed)\n";
-					} else {
-						out << "  Skipped (no unused strings)\n";
-					}
-					out.flush();
-				} catch ( std::exception & e ) {
-					err << "  Error: " << e.what() << "\n";
-					err.flush();
-					exitCode = 1;
-				}
-			}
-			return exitCode;
-		}
 
-		if ( parser.isSet( removeDuplicateVerticesOpt ) ) {
-			const QString inputPath = parser.value( removeDuplicateVerticesOpt );
-			const QStringList fileList = collectNifFiles( inputPath );
-
-			if ( fileList.isEmpty() ) {
-				err << "RemoveDuplicateVertices: no .nif files found at '" << inputPath << "'\n";
-				err.flush();
-				return 1;
-			}
-
-			err << "Warning: --RemoveDuplicateVertices may break Starfield NIF files that reference morph files."
-				" No morph file check is performed.\n";
-			err.flush();
-
-			int exitCode = 0;
-			for ( const QString & filePath : fileList ) {
-				out << "Processing: " << filePath << "\n";
-				out.flush();
-				try {
-					NifModel nif;
-					nif.setBatchProcessingMode( true );
-					{
-						QFile f( filePath );
-						if ( !f.open( QIODevice::ReadOnly ) ) {
-							err << "  Error: cannot open file for reading\n";
-							err.flush();
-							exitCode = 1;
-							continue;
-						}
-						std::string tmp( filePath.toStdString() );
-						nif.load( f, tmp.c_str() );
-					}
-					if ( !nif.getMessages().isEmpty() ) {
-						err << "  Error: failed to parse NIF data\n";
-						err.flush();
-						exitCode = 1;
-						continue;
-					}
-					nif.removeDuplicateVertices();
-					{
-						QFile f( filePath );
-						if ( !f.open( QIODevice::WriteOnly ) ) {
-							err << "  Error: cannot open file for writing\n";
-							err.flush();
-							exitCode = 1;
-							continue;
-						}
-						nif.save( f );
-					}
-					out << "  Saved (duplicate vertices removed)\n";
-					out.flush();
-				} catch ( std::exception & e ) {
-					err << "  Error: " << e.what() << "\n";
-					err.flush();
-					exitCode = 1;
-				}
-			}
-			return exitCode;
-		}
-
-		if ( parser.isSet( removeUnusedVerticesOpt ) ) {
-			const QString inputPath = parser.value( removeUnusedVerticesOpt );
-			const QStringList fileList = collectNifFiles( inputPath );
-
-			if ( fileList.isEmpty() ) {
-				err << "RemoveUnusedVertices: no .nif files found at '" << inputPath << "'\n";
-				err.flush();
-				return 1;
-			}
-
-			err << "Warning: --RemoveUnusedVertices may break Starfield NIF files that reference morph files."
-				" No morph file check is performed.\n";
-			err.flush();
-
-			int exitCode = 0;
-			for ( const QString & filePath : fileList ) {
-				out << "Processing: " << filePath << "\n";
-				out.flush();
-				try {
-					NifModel nif;
-					nif.setBatchProcessingMode( true );
-					{
-						QFile f( filePath );
-						if ( !f.open( QIODevice::ReadOnly ) ) {
-							err << "  Error: cannot open file for reading\n";
-							err.flush();
-							exitCode = 1;
-							continue;
-						}
-						std::string tmp( filePath.toStdString() );
-						nif.load( f, tmp.c_str() );
-					}
-					if ( !nif.getMessages().isEmpty() ) {
-						err << "  Error: failed to parse NIF data\n";
-						err.flush();
-						exitCode = 1;
-						continue;
-					}
-					nif.removeUnusedVertices();
-					{
-						QFile f( filePath );
-						if ( !f.open( QIODevice::WriteOnly ) ) {
-							err << "  Error: cannot open file for writing\n";
-							err.flush();
-							exitCode = 1;
-							continue;
-						}
-						nif.save( f );
-					}
-					out << "  Saved (unused vertices removed)\n";
-					out.flush();
-				} catch ( std::exception & e ) {
-					err << "  Error: " << e.what() << "\n";
-					err.flush();
-					exitCode = 1;
-				}
-			}
-			return exitCode;
-		}
-
-		if ( parser.isSet( generateMeshLODsOpt ) ) {
-			const QString inputPath = parser.value( generateMeshLODsOpt );
-			const QStringList fileList = collectNifFiles( inputPath );
-
-			if ( fileList.isEmpty() ) {
-				err << "GenerateMeshLODs: no .nif files found at '" << inputPath << "'\n";
-				err.flush();
-				return 1;
-			}
-
-			int exitCode = 0;
-			for ( const QString & filePath : fileList ) {
-				out << "Processing: " << filePath << "\n";
-				out.flush();
-				try {
-					NifModel nif;
-					nif.setBatchProcessingMode( true );
-					{
-						QFile f( filePath );
-						if ( !f.open( QIODevice::ReadOnly ) ) {
-							err << "  Error: cannot open file for reading\n";
-							err.flush();
-							exitCode = 1;
-							continue;
-						}
-						std::string tmp( filePath.toStdString() );
-						nif.load( f, tmp.c_str() );
-					}
-					if ( !nif.getMessages().isEmpty() ) {
-						err << "  Error: failed to parse NIF data\n";
-						err.flush();
-						exitCode = 1;
-						continue;
-					}
-					if ( nif.getBSVersion() < 170 ) {
-						out << "  Skipped (Starfield only)\n";
+					QString skipReason;
+					bool processResult = processCallback( nif, skipReason );
+					if ( reportsModificationStatus && !processResult ) {
+						const QString reason = !skipReason.isEmpty()
+							? skipReason
+							: ( !skippedMessage.isEmpty() ? skippedMessage : QString( "not modified" ) );
+						out << "  Skipped (" << reason << ")\n";
 						out.flush();
 						continue;
 					}
-					nif.generateMeshLODs();
-					{
-						QFile f( filePath );
-						if ( !f.open( QIODevice::WriteOnly ) ) {
-							err << "  Error: cannot open file for writing\n";
-							err.flush();
-							exitCode = 1;
-							continue;
-						}
-						nif.save( f );
+
+					QFile f( filePath );
+					if ( !f.open( QIODevice::WriteOnly ) ) {
+						err << "  Error: cannot open file for writing\n";
+						err.flush();
+						exitCode = 1;
+						continue;
 					}
-					out << "  Saved (LODs generated)\n";
+					nif.save( f );
+					out << "  Saved (" << savedMessage << ")\n";
 					out.flush();
 				} catch ( std::exception & e ) {
 					err << "  Error: " << e.what() << "\n";
@@ -900,398 +687,158 @@ int main( int argc, char * argv[] )
 				}
 			}
 			return exitCode;
+		};
+
+		if ( parser.isSet( removeUnusedStringsOpt ) ) {
+			return runBatchOperation(
+				"RemoveUnusedStrings",
+				parser.value( removeUnusedStringsOpt ),
+				"unused strings removed",
+				"no unused strings",
+				true,
+				[]( NifModel & nif, QString & ) {
+					return nif.removeUnusedStrings();
+				} );
+		}
+
+		if ( parser.isSet( removeDuplicateVerticesOpt ) ) {
+			err << "Warning: --RemoveDuplicateVertices may break Starfield NIF files that reference morph files."
+				" No morph file check is performed.\n";
+			err.flush();
+			return runBatchOperation(
+				"RemoveDuplicateVertices",
+				parser.value( removeDuplicateVerticesOpt ),
+				"duplicate vertices removed",
+				QString(),
+				false,
+				[]( NifModel & nif, QString & ) {
+					nif.removeDuplicateVertices();
+					return true;
+				} );
+		}
+
+		if ( parser.isSet( removeUnusedVerticesOpt ) ) {
+			err << "Warning: --RemoveUnusedVertices may break Starfield NIF files that reference morph files."
+				" No morph file check is performed.\n";
+			err.flush();
+			return runBatchOperation(
+				"RemoveUnusedVertices",
+				parser.value( removeUnusedVerticesOpt ),
+				"unused vertices removed",
+				QString(),
+				false,
+				[]( NifModel & nif, QString & ) {
+					nif.removeUnusedVertices();
+					return true;
+				} );
+		}
+
+		if ( parser.isSet( generateMeshLODsOpt ) ) {
+			return runBatchOperation(
+				"GenerateMeshLODs",
+				parser.value( generateMeshLODsOpt ),
+				"LODs generated",
+				"Starfield only",
+				true,
+				[]( NifModel & nif, QString & skipReason ) {
+					if ( nif.getBSVersion() < 170 ) {
+						skipReason = "Starfield only";
+						return false;
+					}
+					nif.generateMeshLODs();
+					return true;
+				} );
 		}
 
 		if ( parser.isSet( optimizeIndicesOpt ) ) {
-			const QString inputPath = parser.value( optimizeIndicesOpt );
-			const QStringList fileList = collectNifFiles( inputPath );
-
-			if ( fileList.isEmpty() ) {
-				err << "OptimizeIndices: no .nif files found at '" << inputPath << "'\n";
-				err.flush();
-				return 1;
-			}
-
-			int exitCode = 0;
-			for ( const QString & filePath : fileList ) {
-				out << "Processing: " << filePath << "\n";
-				out.flush();
-				try {
-					NifModel nif;
-					nif.setBatchProcessingMode( true );
-					{
-						QFile f( filePath );
-						if ( !f.open( QIODevice::ReadOnly ) ) {
-							err << "  Error: cannot open file for reading\n";
-							err.flush();
-							exitCode = 1;
-							continue;
-						}
-						std::string tmp( filePath.toStdString() );
-						nif.load( f, tmp.c_str() );
-					}
-					if ( !nif.getMessages().isEmpty() ) {
-						err << "  Error: failed to parse NIF data\n";
-						err.flush();
-						exitCode = 1;
-						continue;
-					}
+			return runBatchOperation(
+				"OptimizeIndices",
+				parser.value( optimizeIndicesOpt ),
+				"indices optimized",
+				QString(),
+				false,
+				[]( NifModel & nif, QString & ) {
 					nif.optimizeIndices();
-					{
-						QFile f( filePath );
-						if ( !f.open( QIODevice::WriteOnly ) ) {
-							err << "  Error: cannot open file for writing\n";
-							err.flush();
-							exitCode = 1;
-							continue;
-						}
-						nif.save( f );
-					}
-					out << "  Saved (indices optimized)\n";
-					out.flush();
-				} catch ( std::exception & e ) {
-					err << "  Error: " << e.what() << "\n";
-					err.flush();
-					exitCode = 1;
-				}
-			}
-			return exitCode;
+					return true;
+				} );
 		}
 
 		if ( parser.isSet( addTangentSpacesAndUpdateOpt ) ) {
-			const QString inputPath = parser.value( addTangentSpacesAndUpdateOpt );
-			const QStringList fileList = collectNifFiles( inputPath );
-
-			if ( fileList.isEmpty() ) {
-				err << "AddTangentSpacesAndUpdate: no .nif files found at '" << inputPath << "'\n";
-				err.flush();
-				return 1;
-			}
-
-			int exitCode = 0;
-			for ( const QString & filePath : fileList ) {
-				out << "Processing: " << filePath << "\n";
-				out.flush();
-				try {
-					NifModel nif;
-					nif.setBatchProcessingMode( true );
-					{
-						QFile f( filePath );
-						if ( !f.open( QIODevice::ReadOnly ) ) {
-							err << "  Error: cannot open file for reading\n";
-							err.flush();
-							exitCode = 1;
-							continue;
-						}
-						std::string tmp( filePath.toStdString() );
-						nif.load( f, tmp.c_str() );
-					}
-					if ( !nif.getMessages().isEmpty() ) {
-						err << "  Error: failed to parse NIF data\n";
-						err.flush();
-						exitCode = 1;
-						continue;
-					}
+			return runBatchOperation(
+				"AddTangentSpacesAndUpdate",
+				parser.value( addTangentSpacesAndUpdateOpt ),
+				"tangent spaces added/updated",
+				QString(),
+				false,
+				[]( NifModel & nif, QString & ) {
 					nif.addTangentSpacesAndUpdate();
-					{
-						QFile f( filePath );
-						if ( !f.open( QIODevice::WriteOnly ) ) {
-							err << "  Error: cannot open file for writing\n";
-							err.flush();
-							exitCode = 1;
-							continue;
-						}
-						nif.save( f );
-					}
-					out << "  Saved (tangent spaces added/updated)\n";
-					out.flush();
-				} catch ( std::exception & e ) {
-					err << "  Error: " << e.what() << "\n";
-					err.flush();
-					exitCode = 1;
-				}
-			}
-			return exitCode;
+					return true;
+				} );
 		}
 
 		if ( parser.isSet( updateBoundsOpt ) ) {
-			const QString inputPath = parser.value( updateBoundsOpt );
-			const QStringList fileList = collectNifFiles( inputPath );
-
-			if ( fileList.isEmpty() ) {
-				err << "UpdateBounds: no .nif files found at '" << inputPath << "'\n";
-				err.flush();
-				return 1;
-			}
-
-			int exitCode = 0;
-			for ( const QString & filePath : fileList ) {
-				out << "Processing: " << filePath << "\n";
-				out.flush();
-				try {
-					NifModel nif;
-					nif.setBatchProcessingMode( true );
-					{
-						QFile f( filePath );
-						if ( !f.open( QIODevice::ReadOnly ) ) {
-							err << "  Error: cannot open file for reading\n";
-							err.flush();
-							exitCode = 1;
-							continue;
-						}
-						std::string tmp( filePath.toStdString() );
-						nif.load( f, tmp.c_str() );
-					}
-					if ( !nif.getMessages().isEmpty() ) {
-						err << "  Error: failed to parse NIF data\n";
-						err.flush();
-						exitCode = 1;
-						continue;
-					}
+			return runBatchOperation(
+				"UpdateBounds",
+				parser.value( updateBoundsOpt ),
+				"bounds updated",
+				QString(),
+				false,
+				[]( NifModel & nif, QString & ) {
 					nif.updateBounds();
-					{
-						QFile f( filePath );
-						if ( !f.open( QIODevice::WriteOnly ) ) {
-							err << "  Error: cannot open file for writing\n";
-							err.flush();
-							exitCode = 1;
-							continue;
-						}
-						nif.save( f );
-					}
-					out << "  Saved (bounds updated)\n";
-					out.flush();
-				} catch ( std::exception & e ) {
-					err << "  Error: " << e.what() << "\n";
-					err.flush();
-					exitCode = 1;
-				}
-			}
-			return exitCode;
+					return true;
+				} );
 		}
 
 		if ( parser.isSet( combinePropertiesOpt ) ) {
-			const QString inputPath = parser.value( combinePropertiesOpt );
-			const QStringList fileList = collectNifFiles( inputPath );
-
-			if ( fileList.isEmpty() ) {
-				err << "CombineProperties: no .nif files found at '" << inputPath << "'\n";
-				err.flush();
-				return 1;
-			}
-
-			int exitCode = 0;
-			for ( const QString & filePath : fileList ) {
-				out << "Processing: " << filePath << "\n";
-				out.flush();
-				try {
-					NifModel nif;
-					nif.setBatchProcessingMode( true );
-					{
-						QFile f( filePath );
-						if ( !f.open( QIODevice::ReadOnly ) ) {
-							err << "  Error: cannot open file for reading\n";
-							err.flush();
-							exitCode = 1;
-							continue;
-						}
-						std::string tmp( filePath.toStdString() );
-						nif.load( f, tmp.c_str() );
-					}
-					if ( !nif.getMessages().isEmpty() ) {
-						err << "  Error: failed to parse NIF data\n";
-						err.flush();
-						exitCode = 1;
-						continue;
-					}
+			return runBatchOperation(
+				"CombineProperties",
+				parser.value( combinePropertiesOpt ),
+				"properties combined",
+				QString(),
+				false,
+				[]( NifModel & nif, QString & ) {
 					nif.combineProperties();
-					{
-						QFile f( filePath );
-						if ( !f.open( QIODevice::WriteOnly ) ) {
-							err << "  Error: cannot open file for writing\n";
-							err.flush();
-							exitCode = 1;
-							continue;
-						}
-						nif.save( f );
-					}
-					out << "  Saved (properties combined)\n";
-					out.flush();
-				} catch ( std::exception & e ) {
-					err << "  Error: " << e.what() << "\n";
-					err.flush();
-					exitCode = 1;
-				}
-			}
-			return exitCode;
+					return true;
+				} );
 		}
 
 		if ( parser.isSet( removeBogusNodesOpt ) ) {
-			const QString inputPath = parser.value( removeBogusNodesOpt );
-			const QStringList fileList = collectNifFiles( inputPath );
-
-			if ( fileList.isEmpty() ) {
-				err << "RemoveBogusNodes: no .nif files found at '" << inputPath << "'\n";
-				err.flush();
-				return 1;
-			}
-
-			int exitCode = 0;
-			for ( const QString & filePath : fileList ) {
-				out << "Processing: " << filePath << "\n";
-				out.flush();
-				try {
-					NifModel nif;
-					nif.setBatchProcessingMode( true );
-					{
-						QFile f( filePath );
-						if ( !f.open( QIODevice::ReadOnly ) ) {
-							err << "  Error: cannot open file for reading\n";
-							err.flush();
-							exitCode = 1;
-							continue;
-						}
-						std::string tmp( filePath.toStdString() );
-						nif.load( f, tmp.c_str() );
-					}
-					if ( !nif.getMessages().isEmpty() ) {
-						err << "  Error: failed to parse NIF data\n";
-						err.flush();
-						exitCode = 1;
-						continue;
-					}
+			return runBatchOperation(
+				"RemoveBogusNodes",
+				parser.value( removeBogusNodesOpt ),
+				"bogus nodes removed",
+				QString(),
+				false,
+				[]( NifModel & nif, QString & ) {
 					nif.removeBogusNodes();
-					{
-						QFile f( filePath );
-						if ( !f.open( QIODevice::WriteOnly ) ) {
-							err << "  Error: cannot open file for writing\n";
-							err.flush();
-							exitCode = 1;
-							continue;
-						}
-						nif.save( f );
-					}
-					out << "  Saved (bogus nodes removed)\n";
-					out.flush();
-				} catch ( std::exception & e ) {
-					err << "  Error: " << e.what() << "\n";
-					err.flush();
-					exitCode = 1;
-				}
-			}
-			return exitCode;
+					return true;
+				} );
 		}
 
 		if ( parser.isSet( reorderBlocksOpt ) ) {
-			const QString inputPath = parser.value( reorderBlocksOpt );
-			const QStringList fileList = collectNifFiles( inputPath );
-
-			if ( fileList.isEmpty() ) {
-				err << "ReorderBlocks: no .nif files found at '" << inputPath << "'\n";
-				err.flush();
-				return 1;
-			}
-
-			int exitCode = 0;
-			for ( const QString & filePath : fileList ) {
-				out << "Processing: " << filePath << "\n";
-				out.flush();
-				try {
-					NifModel nif;
-					nif.setBatchProcessingMode( true );
-					{
-						QFile f( filePath );
-						if ( !f.open( QIODevice::ReadOnly ) ) {
-							err << "  Error: cannot open file for reading\n";
-							err.flush();
-							exitCode = 1;
-							continue;
-						}
-						std::string tmp( filePath.toStdString() );
-						nif.load( f, tmp.c_str() );
-					}
-					if ( !nif.getMessages().isEmpty() ) {
-						err << "  Error: failed to parse NIF data\n";
-						err.flush();
-						exitCode = 1;
-						continue;
-					}
+			return runBatchOperation(
+				"ReorderBlocks",
+				parser.value( reorderBlocksOpt ),
+				"blocks reordered",
+				QString(),
+				false,
+				[]( NifModel & nif, QString & ) {
 					nif.reorderBlocks();
-					{
-						QFile f( filePath );
-						if ( !f.open( QIODevice::WriteOnly ) ) {
-							err << "  Error: cannot open file for writing\n";
-							err.flush();
-							exitCode = 1;
-							continue;
-						}
-						nif.save( f );
-					}
-					out << "  Saved (blocks reordered)\n";
-					out.flush();
-				} catch ( std::exception & e ) {
-					err << "  Error: " << e.what() << "\n";
-					err.flush();
-					exitCode = 1;
-				}
-			}
-			return exitCode;
+					return true;
+				} );
 		}
 
 		if ( parser.isSet( sanitizeBeforeSaveOpt ) ) {
-			const QString inputPath = parser.value( sanitizeBeforeSaveOpt );
-			const QStringList fileList = collectNifFiles( inputPath );
-
-			if ( fileList.isEmpty() ) {
-				err << "SanitizeBeforeSave: no .nif files found at '" << inputPath << "'\n";
-				err.flush();
-				return 1;
-			}
-
-			int exitCode = 0;
-			for ( const QString & filePath : fileList ) {
-				out << "Processing: " << filePath << "\n";
-				out.flush();
-				try {
-					NifModel nif;
-					nif.setBatchProcessingMode( true );
-					{
-						QFile f( filePath );
-						if ( !f.open( QIODevice::ReadOnly ) ) {
-							err << "  Error: cannot open file for reading\n";
-							err.flush();
-							exitCode = 1;
-							continue;
-						}
-						std::string tmp( filePath.toStdString() );
-						nif.load( f, tmp.c_str() );
-					}
-					if ( !nif.getMessages().isEmpty() ) {
-						err << "  Error: failed to parse NIF data\n";
-						err.flush();
-						exitCode = 1;
-						continue;
-					}
+			return runBatchOperation(
+				"SanitizeBeforeSave",
+				parser.value( sanitizeBeforeSaveOpt ),
+				"sanitized before save",
+				QString(),
+				false,
+				[]( NifModel & nif, QString & ) {
 					nif.sanitizeBeforeSave();
-					{
-						QFile f( filePath );
-						if ( !f.open( QIODevice::WriteOnly ) ) {
-							err << "  Error: cannot open file for writing\n";
-							err.flush();
-							exitCode = 1;
-							continue;
-						}
-						nif.save( f );
-					}
-					out << "  Saved (sanitized before save)\n";
-					out.flush();
-				} catch ( std::exception & e ) {
-					err << "  Error: " << e.what() << "\n";
-					err.flush();
-					exitCode = 1;
-				}
-			}
-			return exitCode;
+					return true;
+				} );
 		}
 	}
 

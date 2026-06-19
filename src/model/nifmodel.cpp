@@ -2030,8 +2030,8 @@ bool NifModel::checkInternalGeometry( const QModelIndex & blockIndex )
 		return true;
 	if ( get<quint32>( blockIndex, "Flags" ) & 0x0200 )
 		return true;
-	// In headless/batch mode there is no QApplication, so skip the dialog and report
-	// the block as non-convertible rather than crashing.
+	// In batch/headless mode interactive dialogs are unavailable, so report
+	// the block as non-convertible instead of prompting.
 	if ( getBatchProcessingMode() )
 		return false;
 	if ( QMessageBox::question( parentWindow, tr( "NifSkope warning" ),
