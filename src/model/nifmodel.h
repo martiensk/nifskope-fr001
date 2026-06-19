@@ -103,25 +103,25 @@ public:
 	bool convertToExternalGeometry( const QString & outputDirectory );
 	//! Remove any unreferenced strings from the NIF header. Returns true if any strings were removed.
 	bool removeUnusedStrings();
-	//! Remove duplicate vertices from all geometry blocks. Always returns true (file is always saved).
+	//! Remove duplicate vertices from all geometry blocks. Returns true when the batch operation runs; modifications are in-memory only (not auto-saved).
 	bool removeDuplicateVertices();
-	//! Remove unused vertices from all geometry blocks. Always returns true (file is always saved).
+	//! Remove unused vertices from all geometry blocks. Returns true when the batch operation runs; modifications are in-memory only (not auto-saved).
 	bool removeUnusedVertices();
-	//! Generate Starfield mesh LODs for internal BSGeometry blocks. Always returns true (file is always saved).
+	//! Generate Starfield mesh LODs for internal BSGeometry blocks. Returns true when the batch operation runs; modifications are in-memory only (not auto-saved).
 	bool generateMeshLODs();
-	//! Optimize triangle index ordering for vertex cache efficiency across all geometry blocks. Always returns true (file is always saved).
+	//! Optimize triangle index ordering for vertex cache efficiency across all geometry blocks. Returns true when the batch operation runs; modifications are in-memory only (not auto-saved).
 	bool optimizeIndices();
-	//! Add missing tangent space arrays and update tangents/bitangents across applicable geometry blocks. Always returns true (file is always saved).
+	//! Add missing tangent space arrays and update tangents/bitangents across applicable geometry blocks. Returns true when the batch operation runs; modifications are in-memory only (not auto-saved).
 	bool addTangentSpacesAndUpdate();
-	//! Update bounding spheres/boxes for applicable geometry blocks. Always returns true (file is always saved).
+	//! Update bounding spheres/boxes for applicable geometry blocks. Returns true when the batch operation runs; modifications are in-memory only (not auto-saved).
 	bool updateBounds();
-	//! Combine duplicate shader properties into a single shared block. Always returns true (file is always saved).
+	//! Combine duplicate shader properties into a single shared block. Returns true when the batch operation runs; modifications are in-memory only (not auto-saved).
 	bool combineProperties();
-	//! Remove bogus/unlinked nodes for the target NIF version. Always returns true (file is always saved).
+	//! Remove bogus/unlinked nodes for the target NIF version. Returns true when the batch operation runs; modifications are in-memory only (not auto-saved).
 	bool removeBogusNodes();
-	//! Reorder blocks so the game can properly load them. Always returns true (file is always saved).
+	//! Reorder blocks so the game can properly load them. Returns true when the batch operation runs; modifications are in-memory only (not auto-saved).
 	bool reorderBlocks();
-	//! Sanitize before save to fix minor errors (for example duplicate block names). Always returns true (file is always saved).
+	//! Sanitize before save to fix minor errors (for example duplicate block names). Returns true when the batch operation runs; modifications are in-memory only (not auto-saved).
 	bool sanitizeBeforeSave();
 	bool load( QIODevice & device, const char* fileName = nullptr ) override final;
 	bool save( QIODevice & device ) const override final;

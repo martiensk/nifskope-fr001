@@ -500,6 +500,7 @@ int main( int argc, char * argv[] )
 		}
 
 		// Load NIF/XML schema (required before any NifModel usage)
+		QDir::setCurrent( qApp->applicationDirPath() );
 		NifModel::loadXML();
 		KfmModel::loadXML();
 
